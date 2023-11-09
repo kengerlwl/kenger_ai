@@ -59,6 +59,36 @@ class sqlitDatabase:
             print(f'读取数据时发生错误：{e}')
             return None
         
+    def read_data_by_module(self, module):
+        try:
+            self.cursor.execute(f'''
+                SELECT * FROM crawled_data WHERE module=?
+            ''', (module,))
+            data = self.cursor.fetchall()
+
+            # 返回所有数据
+            all_data = []
+
+            if data:
+                for item in data:
+                    # print(item)
+                    item_dict = {
+                        'word_title': item[0],
+                        'timestamp': item[1],
+                        'html_content': item[2],
+                        'p_content': item[3],
+                        'module': item[4]
+                    }
+                    all_data.append(item_dict)
+          
+                return all_data
+            else:
+                print(f'未找到数据：')
+                return []
+        except sqlite3.Error as e:
+            print(f'读取数据时发生错误：{e}')
+            return []   
+    
     def read_all_data(self):
         try:
             self.cursor.execute('''
@@ -71,7 +101,7 @@ class sqlitDatabase:
 
             if data:
                 for item in data:
-                    print(item)
+                    # print(item)
                     item_dict = {
                         'word_title': item[0],
                         'timestamp': item[1],
@@ -83,7 +113,7 @@ class sqlitDatabase:
           
                 return all_data
             else:
-                print(f'未找到数据：{word_title}')
+                print(f'未找到数据：')
                 return []
         except sqlite3.Error as e:
             print(f'读取数据时发生错误：{e}')
@@ -98,6 +128,9 @@ if __name__ == "__main__":
     db = sqlitDatabase('../mengNiang.db')
     # db.insert_data('test42', '2020-01-012', 'test', 'test', "test")
     # a = db.read_all_data()
-    a = db.read_data('太长不看')
-    print(a)
+    # a = db.read_data('太长不看')
+    a = db.read_data_by_module('中国网络流行语句')
+    # print(a)
+    for i in a:
+        print(i['word_title'])
     db.close()
